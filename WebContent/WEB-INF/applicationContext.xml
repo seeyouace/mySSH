@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:solr="http://www.springframework.org/schema/data/solr"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+           http://www.springframework.org/schema/tx  
+           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+           http://www.springframework.org/schema/data/solr
+           http://www.springframework.org/schema/data/solr/spring-solr.xsd">
+
+    <context:annotation-config></context:annotation-config>
+    
+    <context:component-scan base-package="com.mySSH"></context:component-scan>
+    
+    <bean  id="placeholderConfig"
+ 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	    <property name="locations">
+	        <value>classpath:init.properties</value>
+	    </property>
+	</bean>
+
+    <bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+	    <property name="packagesToScan">
+	      <list>
+	        <value>com.mySSH.*.model</value>         
+	      </list>
+	    </property> 
+
+	    <property name="hibernateProperties">
+	    	<props>
+               <prop key="hibernate.connection.provider_class">${hibernate.connection.provider_class}</prop>
+               <prop key="hibernate.proxool.pool_alias">${hibernate.proxool.pool_alias}</prop>
+               <prop key="hibernate.proxool.xml">${hibernate.proxool.xml}</prop>
+               <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+               <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+               <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+               <prop key="hibernate.use_sql_comments">${hibernate.use_sql_comments}</prop>
+               <prop key="hibernate.cache.use_second_level_cache">true</prop> 
+               <prop key="hibernate.cache.use_query_cache">true</prop>
+               <prop key="hibernate.cache.provider_class">${hibernate.cache.provider_class}</prop>
+               <prop key="hibernate.cache.use_structured_entries">${hibernate.cache.use_structured_entries}</prop>
+               <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+               <!-- <prop key="hibernate.connection.autocommit">${hibernate.connection.autocommit}</prop> -->
+            </props>
+	    </property>
+    </bean>
+ 
+  <bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+  </bean>   
+  
+  <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+  
+	<bean id="txManager" 
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager"> 
+		<property name="sessionFactory" ref="sessionFactory" /> 
+	</bean> 
+
+    <!--edited by wyj-->
+	<tx:annotation-driven transaction-manager="txManager" />
+	
+	<aop:config>
+		<aop:pointcut id="bussinessService" expression="execution(public * com.mySSH..*service..*.*(..))" />
+		<aop:advisor pointcut-ref="bussinessService" advice-ref="txAdvicer"/>
+	</aop:config>
+	
+	<tx:advice id="txAdvicer" transaction-manager="txManager"> 
+	  <tx:attributes>   
+	     
+	    <tx:method name="remove*" propagation="REQUIRED"/>
+	    <tx:method name="cancle*" propagation="REQUIRED"/>
+	    <tx:method name="cancel*" propagation="REQUIRED"/>
+	    <tx:method name="delete*" propagation="REQUIRED"/>
+	    <tx:method name="del*" propagation="REQUIRED"/>
+	    
+	    <tx:method name="add*" propagation="REQUIRED"  />
+	    <tx:method name="save*" propagation="REQUIRED"/>
+	    <tx:method name="log*" propagation="REQUIRED"/>
+	    <tx:method name="update*" propagation="REQUIRED"/>
+	    <tx:method name="edit*" propagation="REQUIRED" />
+	      
+	    <tx:method name="find*" propagation="REQUIRED"/>
+	    <tx:method name="get*" propagation="REQUIRED"/>
+	    <tx:method name="exists*" propagation="REQUIRED"/>	
+	    <tx:method name="check*" propagation="REQUIRED"/>	
+	    
+	    <tx:method name="send*" propagation="REQUIRED"  />
+	    <tx:method name="sms*" propagation="REQUIRED"  />
+	    <tx:method name="push*" propagation="REQUIRED"/>
+	  </tx:attributes> 
+	</tx:advice>
+	
+	
+	
+</beans>

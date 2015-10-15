@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		the proxool configuration can be embedded within your own
+		application's. Anything outside the "proxool" tag is ignored.
+	-->
+
+<something-else-entirely>
+	<proxool>
+		<alias>ConnectionPool</alias>
+		<driver-url>jdbc:mysql://localhost:3306/myssh</driver-url>
+
+        <driver-class>com.mysql.jdbc.Driver</driver-class>
+		<driver-properties>
+			<property name="user" value="root" />
+			<property name="password" value="123456"/>
+		</driver-properties>
+		
+		<maximum-connection-count>200</maximum-connection-count>
+		<minimum-connection-count>5</minimum-connection-count>
+		<house-keeping-sleep-time>60000</house-keeping-sleep-time>
+        <house-keeping-test-sql>select CURRENT_DATE</house-keeping-test-sql>
+		<simultaneous-build-throttle>20</simultaneous-build-throttle>
+		<prototype-count>5</prototype-count>
+	</proxool>
+</something-else-entirely>
